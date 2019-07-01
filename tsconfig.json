@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "target": "esnext",
+        "module": "commonjs",
+        "sourceMap": true,
+        "jsx": "react",
+        "skipLibCheck": true
+    },
+    "include": [
+        "./src/**/*.ts",
+        "./src/types/**/*.ts",
+        "./node_modules/@types/**/*.ts"
+    ],
+    "files": [
+        "src/main.ts"
+    ]
+}
