@@ -22,7 +22,6 @@ export default class CardsAnimation{
             if (index > this.maxCards) {
                 index = index - this.maxCards;
             }
-
             texture = Texture.from(this.texture + index+'.jpg');
             const card = new Sprite(texture);
             card.width = 100;

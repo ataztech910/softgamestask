@@ -13,7 +13,7 @@ export default class Menu {
         let i = 0;
         let regularColor = 0x808F85;
         let selectedColor = 0xF2E9DC;
-        console.log('current menu is from draw', this.currentMenu);
+        //TODO move this variables to global scope
         this.menu.forEach( element =>{
             let text = new PIXI.Text(element.title, { fontFamily: 'Arial', fontSize: 18, fill: element.state !== this.currentMenu ? regularColor : selectedColor, align: 'center' });    
             text.anchor.set(-0.2-(i), -1.8);

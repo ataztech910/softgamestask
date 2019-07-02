@@ -2,10 +2,10 @@ import Menu from "../scenes/Menu";
 import MenuObject from "./menuobject";
 
 export default class GameConfiguration{
-    cardsUrl: string;
+    assetsUrl: string;
     menu: Array<MenuObject>;
     constructor(cardsUrl: string, menu: Array<MenuObject>){
-        this.cardsUrl = cardsUrl;
+        this.assetsUrl = cardsUrl;
         this.menu = menu;
     }
 }

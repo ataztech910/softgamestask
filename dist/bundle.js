@@ -21854,6 +21854,8 @@ const Menu_1 = __webpack_require__(/*! ./scenes/Menu */ 194);
 
 const game_configuration_1 = __webpack_require__(/*! ./components/game.configuration */ 195);
 
+const ToolAnimation_1 = __webpack_require__(/*! ./scenes/ToolAnimation */ 198);
+
 new class Main {
   constructor() {
     this.settings = {
@@ -21863,6 +21865,9 @@ new class Main {
     this.gamesSettings = {
       stageOne: {
         cardCount: 144
+      },
+      stageTwo: {
+        elementsCount: 3
       }
     };
     this.currentState = 'cardgame';
@@ -21874,7 +21879,11 @@ new class Main {
       title: 'Tool Game',
       state: 'toolgame',
       changeState: () => this.changeMenuState('toolgame')
-    }]);
+    }]); //----------
+    //TODO Organize this into extended method
+
+    pixi_js_1.loader.add([this.configuration.assetsUrl + '/smiles/' + 'smiles.png']); //-------------------    
+
     this.app = new pixi_js_1.Application(window.innerWidth, 2000, this.settings);
     document.body.appendChild(this.app.view);
     this.changeMenuState(this.currentState);
@@ -21908,6 +21917,20 @@ new class Main {
 
   toolGameStart() {
     this.clearStage();
+    const toolContainer = new ToolAnimation_1.default(this.configuration.assetsUrl + '/smiles/', this.gamesSettings.stageTwo.elementsCount);
+    toolContainer.load();
+    this.app.stage.addChild(toolContainer.containers[0]);
+    this.app.stage.addChild(toolContainer.containers[1]);
+    this.app.stage.addChild(toolContainer.containers[2]); // setInterval(()=>{
+    //     toolContainer.drawTools()
+    // },2000);
+
+    let currentTicker = 128;
+    this.app.ticker.add(() => {
+      toolContainer.drawTools(currentTicker);
+      currentTicker--;
+      if (currentTicker == 0) currentTicker = 128;
+    });
     console.log('tool Game');
   }
 
@@ -21918,11 +21941,11 @@ new class Main {
 
   cardGameStart() {
     this.clearStage();
-    const cardsContainer = new CardsAnimation_1.default(this.configuration.cardsUrl + '/cards/', this.gamesSettings.stageOne.cardCount);
+    const cardsContainer = new CardsAnimation_1.default(this.configuration.assetsUrl + '/cards/', this.gamesSettings.stageOne.cardCount);
     cardsContainer.load();
     this.app.stage.addChild(cardsContainer.container);
     let i = 0;
-    let text = new PIXI.Text('fps', {
+    let text = new pixi_js_1.Text('fps', {
       fontFamily: 'Arial',
       fontSize: 24,
       fill: 0xff1010,
@@ -44255,8 +44278,8 @@ class Menu {
   drawMenu() {
     let i = 0;
     let regularColor = 0x808F85;
-    let selectedColor = 0xF2E9DC;
-    console.log('current menu is from draw', this.currentMenu);
+    let selectedColor = 0xF2E9DC; //TODO move this variables to global scope
+
     this.menu.forEach(element => {
       let text = new PIXI.Text(element.title, {
         fontFamily: 'Arial',
@@ -44297,13 +44320,125 @@ Object.defineProperty(exports, "__esModule", {
 
 class GameConfiguration {
   constructor(cardsUrl, menu) {
-    this.cardsUrl = cardsUrl;
+    this.assetsUrl = cardsUrl;
     this.menu = menu;
   }
 
 }
 
 exports.default = GameConfiguration;
+
+/***/ }),
+/* 196 */,
+/* 197 */,
+/* 198 */
+/*!*************************************!*\
+  !*** ./src/scenes/ToolAnimation.ts ***!
+  \*************************************/
+/*! dynamic exports provided */
+/*! all exports used */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+const pixi_js_1 = __webpack_require__(/*! pixi.js */ 22);
+
+class Tool {
+  constructor(texture, elementsCount) {
+    this.containers = []; // container1 = new Container();
+    // container2 = new Container();
+
+    this.minCardWidth = 32;
+    this.minCardHeight = 32;
+    this.minCardX = -2;
+    this.minCardY = -2;
+    this.containerSize = 45;
+    this.possibleWords = ['Funny', 'Scary', 'Moody', 'Normal', 'Yahoo', 'Not matter', 'Use your imagination'];
+    this.possibleX = [0, 61, 116];
+    this.possibleY = [0, 72, 165];
+    this.elementsCount = elementsCount;
+    this.texture = texture;
+  }
+
+  load() {
+    this.initContainers();
+    this.drawTools(); // this.containers[1].y = 100;
+  }
+
+  initContainers() {
+    for (let i = 0; i < 3; i++) {
+      this.containers[i] = new pixi_js_1.Container();
+    }
+  }
+
+  timer(currentTime) {
+    currentTime = currentTime === 128 ? true : false;
+    return currentTime;
+  }
+
+  drawTools(ticker = 128) {
+    if (this.timer(ticker)) {
+      let delta = 0;
+      [0, 1, 2].forEach(element => {
+        this.containers[element].y = 100 + delta;
+        this.containers[element].removeChildren();
+        const currentElement = this.generateRandomIndex(1);
+
+        switch (currentElement) {
+          case 0:
+            this.generateIcon(this.generateRandomIndex(this.possibleX.length), this.generateRandomIndex(this.possibleY.length), element);
+            break;
+
+          default:
+            this.generateText(this.generateRandomIndex(this.possibleWords.length - 1), element);
+        }
+
+        delta += 100;
+      });
+    }
+  }
+
+  generateRandomIndex(limit) {
+    return Math.floor(Math.random() * (limit + 1));
+  }
+
+  generateIcon(x, y, containerIndex) {
+    const card = new pixi_js_1.Sprite(this.doFramefromTile(this.texture + 'smiles.png', this.possibleX[x], this.possibleY[y], this.containerSize, this.containerSize));
+    card.width = this.minCardWidth;
+    card.height = this.minCardHeight;
+    card.anchor.set(this.minCardX, this.minCardY);
+    this.containers[containerIndex].addChild(card);
+  }
+
+  generateText(index, containerIndex) {
+    const fontSize = this.generateRandomIndex(40);
+    const text = new pixi_js_1.Text(this.possibleWords[index], {
+      fontFamily: 'Arial',
+      fontSize: fontSize > 10 ? fontSize : 24,
+      fill: 0xff1010,
+      align: 'left'
+    });
+    text.x = 100;
+    text.y = 70;
+    this.containers[containerIndex].addChild(text);
+  }
+
+  doFramefromTile(source, x, y, width, height) {
+    let texture, imageFrame;
+    const base = pixi_js_1.BaseTexture.fromImage(pixi_js_1.loader.resources[source.toString()].url);
+    imageFrame = new pixi_js_1.Rectangle(x, y, width, height);
+    texture = new pixi_js_1.Texture(base, imageFrame);
+    return texture;
+  }
+
+}
+
+exports.default = Tool;
 
 /***/ })
 ],[89]);
