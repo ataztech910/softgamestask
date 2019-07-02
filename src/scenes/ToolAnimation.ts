@@ -3,8 +3,6 @@ export default class Tool{
     elementsCount: number; 
     texture: string;
     containers:Array<Container> = [];
-    // container1 = new Container();
-    // container2 = new Container();
     private minCardWidth: number = 32;
     private minCardHeight: number = 32;
     private minCardX: number = -2;
@@ -20,16 +18,15 @@ export default class Tool{
     load() {
         this.initContainers();
         this.drawTools();
-        // this.containers[1].y = 100;
     }
     initContainers() {
         for (let i = 0; i < 3; i++) {
             this.containers[i] = new Container();
         }
     }
-    timer(currentTime){
-        currentTime = currentTime === 128 ? true: false;
-        return currentTime;
+    timer(currentTime: number){
+        const time = currentTime === 128 ? true: false;
+        return time;
     }
     drawTools(ticker: number = 128) {
         if (this.timer(ticker)){
@@ -50,11 +47,11 @@ export default class Tool{
         }
     }
 
-    generateRandomIndex(limit){
+    generateRandomIndex(limit: number){
         return Math.floor(Math.random() * (limit + 1));
     }
 
-    generateIcon(x, y, containerIndex){
+    generateIcon(x: number, y: number, containerIndex: number){
         const card = new Sprite(this.doFramefromTile(this.texture + 'smiles.png', this.possibleX[x], this.possibleY[y], this.containerSize, this.containerSize));
         card.width = this.minCardWidth;
         card.height = this.minCardHeight;

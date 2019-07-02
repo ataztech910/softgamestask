@@ -3,6 +3,7 @@ import CardsAnimation from './scenes/CardsAnimation';
 import Menu from './scenes/Menu';
 import GameConfiguration from './components/game.configuration';
 import Tool from './scenes/ToolAnimation';
+import Flames from './scenes/Flames';
 new class Main {
  
     app: Application;
@@ -33,6 +34,11 @@ new class Main {
                 title: 'Tool Game',
                 state: 'toolgame',
                 changeState: () => this.changeMenuState('toolgame')
+            },
+            {
+                title: 'Flames',
+                state: 'flames',
+                changeState: () => this.changeMenuState('flames')
             }
         ]
     );
@@ -49,7 +55,7 @@ new class Main {
         document.body.appendChild(this.app.view);
         this.changeMenuState(this.currentState);
     }
-    changeMenuState(context){
+    changeMenuState(context: string){
         this.setState(context);
         switch (this.currentState) {
             case 'cardgame':
@@ -58,6 +64,9 @@ new class Main {
             case 'toolgame':
                 this.toolGameStart();
                 break;
+            case 'flames':
+                this.flameParticles();
+                break;
             default: return null;
         }
     }
@@ -65,7 +74,7 @@ new class Main {
         let menu = new Menu(this.configuration.menu, this.currentState);
         this.app.stage.addChild(menu.container);
     }
-    setState(state){
+    setState(state: string){
         this.currentState = state;
     }
     toolGameStart() {
@@ -76,17 +85,30 @@ new class Main {
         this.app.stage.addChild(toolContainer.containers[1]);
         this.app.stage.addChild(toolContainer.containers[2]);
         
-        // setInterval(()=>{
-        //     toolContainer.drawTools()
-        // },2000);
         let currentTicker = 128;
         this.app.ticker.add(() => {
             toolContainer.drawTools(currentTicker);
-            currentTicker--;
+            currentTicker --;
             if (currentTicker == 0) currentTicker = 128;
         });
-        
         console.log('tool Game');
+    }
+    flameParticles(){
+        this.clearStage();
+        const flames = new Flames();
+        let app = this.app;
+        flames.fx.loadBundleFiles(flames.rfxBundleSettings, flames.rfxSpritesheet, null, null).then(function (data) {
+            var content = flames.container;
+            app.stage.addChild(content);
+            var emitter = flames.fx.getParticleEmitter('fire-arc');
+            emitter.init(content, true, 1.5);
+            app.ticker.add(function () {
+                flames.fx.update();
+            });
+        }).catch(function (err) {
+            console.log('Error', err);
+        });
+        console.log('flames');
     }
     clearStage(){
         this.app.stage.removeChildren();

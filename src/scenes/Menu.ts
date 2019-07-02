@@ -16,12 +16,13 @@ export default class Menu {
         //TODO move this variables to global scope
         this.menu.forEach( element =>{
             let text = new PIXI.Text(element.title, { fontFamily: 'Arial', fontSize: 18, fill: element.state !== this.currentMenu ? regularColor : selectedColor, align: 'center' });    
-            text.anchor.set(-0.2-(i), -1.8);
+            text.x = 17+i;
+            text.y = 40;
             text.buttonMode = true;
             text.interactive = true;
             text.on('pointerdown', () => { element.changeState(element.state); });
             this.container.addChild(text);
-            i+=1.5;
+            i+=110;
         });
     }
 }   
