@@ -15,56 +15,64 @@ new class Main {
 
     gamesSettings = {
         stageOne:{
-            cardCount: 144
+            cardCount: 144,
+            stateName: 'cardgame'
         },
         stageTwo:{
-            elementsCount: 3
+            elementsCount: 3,
+            stateName: 'toolgame'
+        },
+        stageThree:{
+            stateName: 'flames'
         }
     };
-    private currentState: string = 'cardgame';
+    
+    private currentState: string = this.gamesSettings.stageOne.stateName;
     private configuration: GameConfiguration = new GameConfiguration(
         '/assets',
         [
             {
                 title: 'Card Game',
-                state: 'cardgame',
-                changeState: () => this.changeMenuState('cardgame')    
+                state: this.gamesSettings.stageOne.stateName,
+                changeState: () => this.changeMenuState(this.gamesSettings.stageOne.stateName)    
             },
             {
                 title: 'Tool Game',
-                state: 'toolgame',
-                changeState: () => this.changeMenuState('toolgame')
+                state: this.gamesSettings.stageTwo.stateName,
+                changeState: () => this.changeMenuState(this.gamesSettings.stageTwo.stateName)
             },
             {
                 title: 'Flames',
-                state: 'flames',
-                changeState: () => this.changeMenuState('flames')
+                state: this.gamesSettings.stageThree.stateName,
+                changeState: () => this.changeMenuState(this.gamesSettings.stageThree.stateName)
             }
         ]
     );
 
     constructor() {
-        //----------
-        //TODO Organize this into extended method
-        loader
-            .add([
-                this.configuration.assetsUrl+ '/smiles/' + 'smiles.png'
-            ]);
-        //-------------------    
         this.app = new Application(window.innerWidth, 2000, this.settings);
+        this.load();
+        this.app.renderer.plugins.interaction.autoPreventDefault = false;
+        this.app.renderer.view.style.touchAction = 'auto';
         document.body.appendChild(this.app.view);
         this.changeMenuState(this.currentState);
+    }
+    load(){
+        loader
+            .add([
+                this.configuration.assetsUrl + '/smiles/' + 'smiles.png'
+        ]);
     }
     changeMenuState(context: string){
         this.setState(context);
         switch (this.currentState) {
-            case 'cardgame':
+            case this.gamesSettings.stageOne.stateName:
                 this.cardGameStart();
                 break;
-            case 'toolgame':
+            case this.gamesSettings.stageTwo.stateName:
                 this.toolGameStart();
                 break;
-            case 'flames':
+            case this.gamesSettings.stageThree.stateName:
                 this.flameParticles();
                 break;
             default: return null;

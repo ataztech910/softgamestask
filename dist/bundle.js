@@ -21866,48 +21866,56 @@ new class Main {
     };
     this.gamesSettings = {
       stageOne: {
-        cardCount: 144
+        cardCount: 144,
+        stateName: 'cardgame'
       },
       stageTwo: {
-        elementsCount: 3
+        elementsCount: 3,
+        stateName: 'toolgame'
+      },
+      stageThree: {
+        stateName: 'flames'
       }
     };
-    this.currentState = 'cardgame';
+    this.currentState = this.gamesSettings.stageOne.stateName;
     this.configuration = new game_configuration_1.default('/assets', [{
       title: 'Card Game',
-      state: 'cardgame',
-      changeState: () => this.changeMenuState('cardgame')
+      state: this.gamesSettings.stageOne.stateName,
+      changeState: () => this.changeMenuState(this.gamesSettings.stageOne.stateName)
     }, {
       title: 'Tool Game',
-      state: 'toolgame',
-      changeState: () => this.changeMenuState('toolgame')
+      state: this.gamesSettings.stageTwo.stateName,
+      changeState: () => this.changeMenuState(this.gamesSettings.stageTwo.stateName)
     }, {
       title: 'Flames',
-      state: 'flames',
-      changeState: () => this.changeMenuState('flames')
-    }]); //----------
-    //TODO Organize this into extended method
-
-    pixi_js_1.loader.add([this.configuration.assetsUrl + '/smiles/' + 'smiles.png']); //-------------------    
-
+      state: this.gamesSettings.stageThree.stateName,
+      changeState: () => this.changeMenuState(this.gamesSettings.stageThree.stateName)
+    }]);
     this.app = new pixi_js_1.Application(window.innerWidth, 2000, this.settings);
+    this.load();
+    this.app.renderer.plugins.interaction.autoPreventDefault = false;
+    this.app.renderer.view.style.touchAction = 'auto';
     document.body.appendChild(this.app.view);
     this.changeMenuState(this.currentState);
+  }
+
+  load() {
+    pixi_js_1.loader.add([this.configuration.assetsUrl + '/smiles/' + 'smiles.png']);
   }
 
   changeMenuState(context) {
     this.setState(context);
 
     switch (this.currentState) {
-      case 'cardgame':
+      case this.gamesSettings.stageOne.stateName:
         this.cardGameStart();
         break;
 
-      case 'toolgame':
+      case this.gamesSettings.stageTwo.stateName:
         this.toolGameStart();
         break;
 
-      case 'flames':
+      case this.gamesSettings.stageThree.stateName:
         this.flameParticles();
         break;
 
@@ -44295,6 +44303,8 @@ const pixi_js_1 = __webpack_require__(/*! pixi.js */ 22);
 class Menu {
   constructor(menu, currentMenu) {
     this.container = new pixi_js_1.Container();
+    this.regularColor = 0x808F85;
+    this.selectedColor = 0xF2E9DC;
     this.menu = menu;
     this.currentMenu = currentMenu;
     this.drawMenu();
@@ -44302,14 +44312,11 @@ class Menu {
 
   drawMenu() {
     let i = 0;
-    let regularColor = 0x808F85;
-    let selectedColor = 0xF2E9DC; //TODO move this variables to global scope
-
     this.menu.forEach(element => {
       let text = new PIXI.Text(element.title, {
         fontFamily: 'Arial',
         fontSize: 18,
-        fill: element.state !== this.currentMenu ? regularColor : selectedColor,
+        fill: element.state !== this.currentMenu ? this.regularColor : this.selectedColor,
         align: 'center'
       });
       text.x = 17 + i;

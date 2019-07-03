@@ -43,7 +43,7 @@ module.exports = {
                 minifyCSS: false,
                 minifyJS: false,
                 minifyURLs: false,
-                removeComments: false,
+                removeComments: true,
                 removeEmptyAttributes: false
             },
             hash: false
